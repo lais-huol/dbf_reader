@@ -27,5 +27,6 @@ config = {
 if len(sys.argv) >= 3 and sys.argv[1] == 'validate_tag':
     if sys.argv[2] != version:
         raise Exception(f"A versão TAG [{sys.argv[2]}] é diferente da versão no arquivo setup.py [{version}].")
+    exit()
 
 setup(**config)
