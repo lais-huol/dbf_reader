@@ -15,7 +15,7 @@ config = {
     "include_package_data": True,
     "version": version,
     "download_url": f"https://github.com/lais-huol/dbf_reader/releases/tag/{version}",
-    "url": 'https://github.com/suap-ead/lib_suap_ead',
+    "url": 'https://github.com/lais-huol/dbf_reader',
     "keywords": ['DBF', 'DBC', 'reader', 'datasus', ],
     "classifiers": [
         'Programming Language :: Python :: 3',
