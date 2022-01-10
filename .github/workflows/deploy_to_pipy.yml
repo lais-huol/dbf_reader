@@ -38,7 +38,7 @@ jobs:
       #     coverage run -m unittest tests/test_* \
       #     && coverage report -m
 
-      - name: Lint with flake8
+      - name: Build package
         env:
           RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
         run: python setup.py validate_tag $RELEASE_VERSION && python setup.py sdist
