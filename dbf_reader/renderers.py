@@ -19,8 +19,6 @@ line size:         {self.definition.record_size}
         for field in self.definition.fields:
             result += f"  {field.order} {field.name} {field.type} {field.size} {field.decimals}\n"
 
-    def __str__(self):
-        print(f"{self}")
 
 class DbfDescriptionMarkdown():
     def __init__(self, definition) -> None:
