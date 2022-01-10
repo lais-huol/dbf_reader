@@ -12,7 +12,7 @@ config = {
     "packages": ['dbf_reader'],
     "include_package_data": True,
     "version": '0.1.9',
-    "download_url": 'https://github.com/lais-huol/dbf_reader/releases/tag/0.1.9',
+    "download_url": 'https://github.com/lais-huol/dbf_reader/releases/tag/0.1.2',
     "url": 'https://github.com/suap-ead/lib_suap_ead',
     "keywords": ['DBF', 'DBC', 'reader', 'datasus', ],
     "classifiers": [
