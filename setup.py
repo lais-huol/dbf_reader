@@ -2,6 +2,8 @@ import sys
 from setuptools import setup
 
 
+version = '0.1.3';
+
 config = {
     "name": 'dbf_reader',
     "description": 'Utils classes to read DBF files, specially DATASUS compressed DBF files',
@@ -11,8 +13,8 @@ config = {
     "author_email": 'kelson.medeiros@lais.huol.ufrn.br',
     "packages": ['dbf_reader'],
     "include_package_data": True,
-    "version": '0.1.9',
-    "download_url": 'https://github.com/lais-huol/dbf_reader/releases/tag/0.1.2',
+    "version": version,
+    "download_url": f"https://github.com/lais-huol/dbf_reader/releases/tag/{version}",
     "url": 'https://github.com/suap-ead/lib_suap_ead',
     "keywords": ['DBF', 'DBC', 'reader', 'datasus', ],
     "classifiers": [
@@ -23,7 +25,7 @@ config = {
 }
 
 if len(sys.argv) >= 3 and sys.argv[1] == 'validate_tag':
-    if sys.argv[2] != config['version']:
-        raise Exception(f"A versão TAG [{sys.argv[2]}] é diferente da versão no arquivo setup.py [{config['version']}].")
+    if sys.argv[2] != version:
+        raise Exception(f"A versão TAG [{sys.argv[2]}] é diferente da versão no arquivo setup.py [{version}].")
 
 setup(**config)
