@@ -2,6 +2,11 @@
 
 Python utils classes to read DBF files, specially **DATASUS** compressed DBF files, that a distributed without compliance with the specification.
 
+## What APIs I tested?
+
+- https://github.com/frankyxhl/dbfpy3
+- https://github.com/AlertaDengue/PySUS
+
 ## Local build
 
 ```bash
