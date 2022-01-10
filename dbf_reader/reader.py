@@ -11,7 +11,7 @@ class DbfReader:
         self.encoding = encoding
         self.definition = TableDefinition(self, encoding)
         self.actual_record = 0
-        
+
     def read(self, num_bytes):
         return self.file_object.read(num_bytes)
 

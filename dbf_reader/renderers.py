@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-import struct, datetime, decimal
-import logging
 
 
 class DbfDescriptionPrinter():
@@ -23,7 +21,6 @@ line size:         {self.definition.record_size}
 
     def __str__(self):
         print(f"{self}")
-
 
 class DbfDescriptionMarkdown():
     def __init__(self, definition) -> None:
