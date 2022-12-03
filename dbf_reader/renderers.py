@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-import struct, datetime, decimal
-import logging
 
 
 class DbfDescriptionPrinter():
@@ -20,9 +18,6 @@ line size:         {self.definition.record_size}
         result += "FIELDS (order, name, type, size, decimals)\n"
         for field in self.definition.fields:
             result += f"  {field.order} {field.name} {field.type} {field.size} {field.decimals}\n"
-
-    def __str__(self):
-        print(f"{self}")
 
 
 class DbfDescriptionMarkdown():
