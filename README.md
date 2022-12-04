@@ -2,6 +2,11 @@
 
 Python utils classes to read DBF files, specially **DATASUS** compressed DBF files, that a distributed without compliance with the specification.
 
+```bash
+docker build -t python_dbf_reader . 
+docker run -it --rm -v "$PWD:/app" -w /app python_dbf_reader bash -c 'coverage run -m unittest tests.test_all && coverage report -m'
+```
+
 ## What APIs I tested?
 
 - https://github.com/frankyxhl/dbfpy3
