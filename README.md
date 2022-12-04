@@ -2,23 +2,66 @@
 
 Python utils classes to read DBF files, specially **DATASUS** compressed DBF files, that a distributed without compliance with the specification.
 
+## How to use
+
+### Install
+
+```bash
+pip install dbf_reader
+```
+
+### Fast mode
+
+```python
+from dbf_reader import DbfReader
+rows = [row for row in DbfReader('my.dbf')]
+```
+
+### Full control
+
+```python
+from dbf_reader import DbfReader
+
+with open("my.dbf", 'rb') as f:
+    dbf_reader = DbfReader(f)
+
+    # File info
+    print(dbf_reader.encoding)
+    print(dbf_reader.actual_record)
+    print(dbf_reader.records)
+    print(dbf_reader.last_update)
+    print(dbf_reader.file_size)
+
+    # Table info
+    print(dbf_reader.definition.dbf_format)
+    print(dbf_reader.definition.headerlen)
+    print(dbf_reader.definition.numfields)
+    print(dbf_reader.definition.record_size)
+    print(dbf_reader.definition.terminator)
+    print(dbf_reader.definition.actual_record)
+
+    # Fields info
+    for field in dbf_reader.definition.fields:
+        print(field.order, field.name, field.type, field.size, field.decimals, field.flags)
+
+    for row in DbfReader('my.dbf'):
+        print(row)
+```
+
+## Development and test
+
 ```bash
 docker build -t python_dbf_reader . 
 docker run -it --rm -v "$PWD:/app" -w /app python_dbf_reader bash -c 'flake8 . --count --max-complexity=11 --max-line-length=404 --statistics && coverage run -m unittest tests.test_all && coverage report -m'
 ```
 
-## What APIs I tested?
+
+## DBF specification
+
+### What APIs I tested?
 
 - https://github.com/frankyxhl/dbfpy3
 - https://github.com/AlertaDengue/PySUS
-
-## Local build
-
-```bash
-python setup.py sdist 
-```
-
-## DBF specification
 
 ### Resources
 
