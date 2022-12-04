@@ -30,6 +30,7 @@ class DbfReader:
             self.actual_record += 1
             deleted = self.read(1)
             if deleted != b' ':
+                self.read(self.definition.record_size-1)
                 continue
             result = {}
             for field in self.definition.fields:
