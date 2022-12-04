@@ -2,30 +2,30 @@
 import struct
 import datetime
 import logging
-from .reader import DbfReader
+from io import RawIOBase
 
 
 class TableDefinition:
 
     """ DBF definition
-        self.dbf_format: int == (3=dBASE Level 5; 4=dBASE Level 7; Bit 3 and bit 7=dBASE IV or dBASE for Windows memo file;
-                                 bits 4-6=dBASE IV SQL table; bit 7=.DBT memo file, either a dBASE III PLUS type or
-                                 a dBASE IV or dBASE for Windows memo file).
-        self.last_update: Union[datetime.date, None] == The file update date, None if month or day is 0
-        self.numfields: int == fields count
-        self.record_size: int == size of each DBF line
-        self.fields:list[Field] == field list
-        self.terminator: byte == HEADER terminator character
 
-        An info log will be issued if:
-            - The file update date is invalid.
-            - The file has a polluted trailing, that is, different from 22 \x00
-            - The terminator of the HEADER is different from \r or \x00
-        A debug log will be issued with data from
-          self.reader.records, self.headerlen, self.numfields, self.record_size, self.fields & self.terminator.
+        Args:
+            reader (RawIOBase): DBF reader, default=None
+            encoding (str): order of this field in the table, default='iso-8859-1'
+
+        Attributes:
+            reader (RawIOBase): DBF reader, default=None
+            encoding (str): order of this field in the table, default='iso-8859-1'
+            dbf_format (int): (3=dBASE Level 5; 4=dBASE Level 7; Bit 3 and bit 7=dBASE IV or dBASE for Windows memo file;
+                                    bits 4-6=dBASE IV SQL table; bit 7=.DBT memo file, either a dBASE III PLUS type or
+                                    a dBASE IV or dBASE for Windows memo file).
+            numfields (int): fields count
+            record_size (int): size of each DBF line
+            fields (list[Field]): field list
+            terminator (byte): HEADER terminator character
     """
 
-    def __init__(self, reader: DbfReader = None, encoding: str = 'iso-8859-1') -> None:
+    def __init__(self, reader: RawIOBase = None, encoding: str = 'iso-8859-1') -> None:
         self.reader = reader
         self.encoding = encoding
         if self.reader is not None:
@@ -77,7 +77,6 @@ class TableDefinition:
 
         logging.debug(
             {
-                "records": self.reader.records,
                 "headerlen": self.headerlen,
                 "numfields": self.numfields,
                 "record_size": self.record_size,
@@ -138,31 +137,3 @@ class FieldDefinition:
 
     def __str__(self) -> str:
         return f"#{self.order} {self.name} {self.type}({self.size},{self.decimals})"
-
-    @property
-    def value(self):
-        value = self.table.reader.read(self.size)
-        if self.type == "N":
-            # N 	Numeric 	Number stored as a string, right justified, and padded with blanks to the width of the field.
-            value = value.replace(b'\x00', b'').lstrip()
-            if value == b'':
-                return None
-            if self.decimals > 0:
-                return float(value)
-            else:
-                return int(value)
-        elif self.type == 'D':
-            # D 	Date 	8 bytes - date stored as a string in the format YYYYMMDD.
-            y, m, d = int(value[:4]), int(value[4:6]), int(value[6:8])
-            return datetime.date(y, m, d)
-        elif self.type == 'L':
-            # L 	Logical 	1 byte - initialized to 0x20 (space) otherwise T or F.
-            if value == b'T':
-                return True
-            elif value == b'F':
-                return False
-            else:
-                return None
-        elif self.type == 'C':
-            # C 	Character 	All OEM code page characters - padded with blanks to the width of the field.
-            return value.decode(self.table.reader.encoding).rstrip()
