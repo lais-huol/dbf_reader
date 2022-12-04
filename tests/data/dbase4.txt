@@ -1,7 +1,6 @@
 
 FILE DEFINITION
 filename: tests/data/dbase4.dbf
-number of records: 2
 header's length:   225
 number of fields:  6
 line size:         77

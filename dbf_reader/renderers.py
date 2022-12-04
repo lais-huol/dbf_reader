@@ -11,7 +11,6 @@ class DbfDescriptionText:
         result += f"""
 FILE DEFINITION
 filename: {self.definition.reader.file_object.name}
-number of records: {self.definition.records}
 header's length:   {self.definition.headerlen}
 number of fields:  {self.definition.numfields}
 line size:         {self.definition.record_size}
@@ -33,7 +32,6 @@ class DbfDescriptionMarkdown:
 
 | info              | value   |
 | ----------------- | ------- |
-| number of records | {self.definition.records:>7} |
 | header's length   | {self.definition.headerlen:>7} |
 | number of fields  | {self.definition.numfields:>7} |
 | line size         | {self.definition.record_size:>7} |

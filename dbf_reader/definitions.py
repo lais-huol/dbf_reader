@@ -22,12 +22,16 @@ class TableDefinition:
             - The file has a polluted trailing, that is, different from 22 \x00
             - The terminator of the HEADER is different from \r or \x00
         A debug log will be issued with data from
-          self.records, self.headerlen, self.numfields, self.record_size, self.fields & self.terminator.
+          self.reader.records, self.headerlen, self.numfields, self.record_size, self.fields & self.terminator.
     """
 
-    def __init__(self, reader: DbfReader) -> None:
+    def __init__(self, reader: DbfReader = None, encoding: str = 'iso-8859-1') -> None:
         self.reader = reader
+        self.encoding = encoding
+        if self.reader is not None:
+            self.read_definition()
 
+    def read_definition(self) -> None:
         # lê um short, que é a versão do DBase
         #       Valid dBASE for Windows table file, bits 0-2 indicate version number: 3 for dBASE Level 5, 4 for dBASE Level 7.
         #       Bit 3 and bit 7 indicate presence of a dBASE IV or dBASE for Windows memo file; bits 4-6 indicate the presence of a dBASE IV SQL table;
@@ -38,14 +42,10 @@ class TableDefinition:
         # lê um long, que é a quantidade de registros
         # lê um short, que é o tamanho do header, incluíndo este dados que estão sendo lidos agora e a lista de definição de campos
         # lê os últimos 22 bytes, estes deveriam ser trailing o ser apenas e ter apenas \x00
-        header_block_size = 32
-        file_header = reader.read(header_block_size)
-        self.dbf_format, y, m, d, self.records, self.headerlen, trailing = struct.unpack('<bbbbLH22s', file_header)
-        if m == 0 or d == 0:
-            logging.info("The file update date is invalid.")
-            self.last_update = None
-        else:
-            self.last_update = datetime.date(y+1900, m, d)
+        HEADER_BLOCK_SIZE = 32
+        file_header = self.reader.read(HEADER_BLOCK_SIZE)
+        self.dbf_format, year, month, day, records, self.headerlen, trailing = struct.unpack('<bbbbLH22s', file_header)
+
         expected_trailing = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
         if trailing != expected_trailing:
             logging.info(f"File has polluted trailing, expected {expected_trailing} but received {trailing}.")
@@ -54,28 +54,30 @@ class TableDefinition:
         # e avançando para o caractere seguinte (32 + 1 = 33)
         # para saber a quantidade de campos é só dividir os bytes restantes no header
         # pelo tamanho da definição de um campo (32 bytes)
-        self.numfields = int((self.headerlen - len(file_header) - 1) / header_block_size)
+        self.numfields = int((self.headerlen - len(file_header) - 1) / HEADER_BLOCK_SIZE)
 
         # agora é só ler a definição de cada campo, começa em 1 pois o primeiro caractere do DBF indica se a linha foi ou apagada
         self.record_size = 1
         self.fields = []
         for fieldno in range(self.numfields):
-            field = FieldDefinition(self, fieldno + 1, reader.read(header_block_size))
+            field = FieldDefinition(self, fieldno + 1, self.reader.read(HEADER_BLOCK_SIZE))
             self.record_size += field.size
             self.fields.append(field)
 
-        # soma +1 pois considerando o HEADER terminator
-        self.file_size = self.headerlen + (self.record_size * self.records) + 1
+        self.reader.records = records
+        self.reader.last_update = datetime.date(year+1900, month, day) if month > 0 and day > 0 else None
+        self.reader.file_size = self.headerlen + (self.record_size * self.reader.records) + 1
 
         # em algum momento o arquivo DBF passou a ser gerado com erro ao invés de ter uma quebra de linha usando \r,
         # passou a ter uma quebra de linha usando \x00 não foi necessariamente em todos os tipos de arquivos,
         # dado que não identifiquei em PFuuaamm, mas identifiquei em STuuaamm, ao menos a partir de 2021.07
-        self.terminator = reader.read(1)
+        self.terminator = self.reader.read(1)
         if self.terminator != '\r':
             logging.info(f"The header terminator should be \\r nas came {self.terminator}.")
+
         logging.debug(
             {
-                "records": self.records,
+                "records": self.reader.records,
                 "headerlen": self.headerlen,
                 "numfields": self.numfields,
                 "record_size": self.record_size,
@@ -83,6 +85,7 @@ class TableDefinition:
                 "terminator": self.terminator,
             }
         )
+
         if self.terminator != b'\r' and self.terminator != b'\x00':
             raise ValueError(f"The HEADER terminator should be \\r, \\x00 is tolerated, however the character found was {self.terminator}.")
 

@@ -3,7 +3,6 @@
 
 | info              | value   |
 | ----------------- | ------- |
-| number of records |       2 |
 | header's length   |     225 |
 | number of fields  |       6 |
 | line size         |     321 |

@@ -1,7 +1,6 @@
 
 FILE DEFINITION
 filename: tests/data/another_dbase3.dbf
-number of records: 14
 header's length:   1025
 number of fields:  31
 line size:         590

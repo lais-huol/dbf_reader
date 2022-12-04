@@ -22,26 +22,25 @@ class TestDbfReader(unittest.TestCase):
     def test_another_dbase3_invalid_last_update(self):
         with open("tests/data/dbase3_invalid_last_update.dbf", 'rb') as f:
             dbf_reader = DbfReader(f)
-            self.assertIsNone(dbf_reader.definition.last_update, None)
+            self.assertIsNone(dbf_reader.last_update, None)
 
     def test_read_another_dbase3_valid_dbf_definition(self):
         with open("tests/data/another_dbase3.dbf", 'rb') as f:
             dbf_reader = DbfReader(f)
             self.assertEqual(dbf_reader.file_object, f)
-            self.assertEqual(dbf_reader.encoding, 'iso-8859-1')
             self.assertEqual(dbf_reader.actual_record, 0)
+            self.assertEqual(dbf_reader.file_size, 9286)
+            self.assertEqual(dbf_reader.records, 14)
+            self.assertEqual(dbf_reader.last_update, datetime.date(1905, 7, 13))
             self.assertIsNotNone(dbf_reader.definition)
             self.assertEqual(dbf_reader.definition.reader, dbf_reader)
-            self.assertEqual(dbf_reader.definition.file_size, 9286)
+            self.assertEqual(dbf_reader.definition.encoding, 'iso-8859-1')
             self.assertEqual(dbf_reader.definition.dbf_format, 3)
-            self.assertEqual(dbf_reader.definition.records, 14)
             self.assertEqual(dbf_reader.definition.headerlen, 1025)
-            self.assertEqual(dbf_reader.definition.last_update, datetime.date(1905, 7, 13))
             self.assertEqual(dbf_reader.definition.numfields, 31)
             self.assertEqual(dbf_reader.definition.record_size, 590)
             self.assertIsNotNone(dbf_reader.definition.fields)
             self.assertEqual(dbf_reader.definition.terminator, b'\r')
-            self.assertEqual(dbf_reader.actual_record, 0)
 
     def test_dbase3_invalid_terminator(self):
         with open("tests/data/dbase3_invalid_terminator.dbf", 'rb') as f:
@@ -69,13 +68,13 @@ class TestDbfReader(unittest.TestCase):
             self.assertEqual(dbf_reader.file_object, f)
             self.assertEqual(dbf_reader.encoding, 'iso-8859-1')
             self.assertEqual(dbf_reader.actual_record, 0)
+            self.assertEqual(dbf_reader.records, 2)
+            self.assertEqual(dbf_reader.last_update, datetime.date(2022, 12, 3))
+            self.assertEqual(dbf_reader.file_size, 380)
             self.assertIsNotNone(dbf_reader.definition)
             self.assertEqual(dbf_reader.definition.reader, dbf_reader)
-            self.assertEqual(dbf_reader.definition.file_size, 380)
             self.assertEqual(dbf_reader.definition.dbf_format, 3)
-            self.assertEqual(dbf_reader.definition.records, 2)
             self.assertEqual(dbf_reader.definition.headerlen, 225)
-            self.assertEqual(dbf_reader.definition.last_update, datetime.date(2022, 12, 3))
             self.assertEqual(dbf_reader.definition.numfields, 6)
             self.assertEqual(dbf_reader.definition.record_size, 77)
             self.assertIsNotNone(dbf_reader.definition.fields)
@@ -88,7 +87,7 @@ class TestDbfReader(unittest.TestCase):
             readed_rows = 0
             for row in dbf_reader:
                 readed_rows += 1
-            self.assertEqual(dbf_reader.actual_record, dbf_reader.definition.records)
+            self.assertEqual(dbf_reader.actual_record, dbf_reader.records)
 
     def test_render_txt(self):
         for filename in ['another_dbase3', 'dbase3', 'dbase4', 'dbase5']:
