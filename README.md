@@ -4,8 +4,7 @@ Python utils classes to read DBF files, specially **DATASUS** compressed DBF fil
 
 ```bash
 docker build -t python_dbf_reader . 
-docker run -it --rm -v "$PWD:/app" -w /app python_dbf_reader bash -c 'flake8 . --count --max-complexity=11 --max-line-length=404 --statistics'
-docker run -it --rm -v "$PWD:/app" -w /app python_dbf_reader bash -c 'coverage run -m unittest tests.test_all && coverage report -m'
+docker run -it --rm -v "$PWD:/app" -w /app python_dbf_reader bash -c 'flake8 . --count --max-complexity=11 --max-line-length=404 --statistics && coverage run -m unittest tests.test_all && coverage report -m'
 ```
 
 ## What APIs I tested?
