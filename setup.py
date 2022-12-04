@@ -2,7 +2,7 @@ import sys
 from setuptools import setup
 
 
-version = '0.1.7'
+version = '0.1.8'
 
 config = {
     "name": 'dbf_reader',
