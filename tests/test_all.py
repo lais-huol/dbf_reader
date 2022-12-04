@@ -47,7 +47,7 @@ class TestDbfReader(unittest.TestCase):
         with open("tests/data/dbase3_invalid_terminator.dbf", 'rb') as f:
             with self.assertRaisesRegex(ValueError, "The HEADER terminator should.*"):
                 DbfReader(f)
-  
+
     def test_dbase3_empty_number(self):
         with open("tests/data/dbase3_empty_number.dbf", 'rb') as f:
             dbf_reader = DbfReader(f)
@@ -75,7 +75,7 @@ class TestDbfReader(unittest.TestCase):
             self.assertEqual(dbf_reader.definition.dbf_format, 3)
             self.assertEqual(dbf_reader.definition.records, 2)
             self.assertEqual(dbf_reader.definition.headerlen, 225)
-            self.assertEqual(dbf_reader.definition.last_update, datetime.date(2022,12, 3))
+            self.assertEqual(dbf_reader.definition.last_update, datetime.date(2022, 12, 3))
             self.assertEqual(dbf_reader.definition.numfields, 6)
             self.assertEqual(dbf_reader.definition.record_size, 77)
             self.assertIsNotNone(dbf_reader.definition.fields)
@@ -88,7 +88,6 @@ class TestDbfReader(unittest.TestCase):
             readed_rows = 0
             for row in dbf_reader:
                 readed_rows += 1
-            deleteds = 1
             self.assertEqual(dbf_reader.actual_record, dbf_reader.definition.records)
 
     def test_render_txt(self):
@@ -113,7 +112,7 @@ class TestDbfReader(unittest.TestCase):
                     self.assertEqual(txt.read(), DbfDescriptionPostgresDDL(DbfReader(f).definition).__str__())
 
     def test_render_postgres_ddl_invalid_sizes(self):
-        with open(f"tests/data/dbase3_invalid_fields.dbf", 'rb') as f:
+        with open("tests/data/dbase3_invalid_fields.dbf", 'rb') as f:
             definition = DbfReader(f).definition
             definition.fields[2].decimals = 0
 
@@ -131,6 +130,6 @@ class TestDbfReader(unittest.TestCase):
                 DbfDescriptionPostgresDDL(definition).__str__()
 
     def test_render_postgres_ddl_invalid_fieldtype(self):
-        with open(f"tests/data/dbase3_invalid_fields_type.dbf", 'rb') as f:
+        with open("tests/data/dbase3_invalid_fields_type.dbf", 'rb') as f:
             with self.assertRaises(ValueError):
                 DbfDescriptionPostgresDDL(DbfReader(f).definition).__str__()
