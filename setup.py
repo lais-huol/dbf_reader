@@ -17,6 +17,7 @@ config = {
     "download_url": f"https://github.com/lais-huol/dbf_reader/releases/tag/{version}",
     "url": 'https://github.com/lais-huol/dbf_reader',
     "keywords": ['DBF', 'DBC', 'reader', 'datasus', ],
+    "python_requires": '>=3.7.0',
     "classifiers": [
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
