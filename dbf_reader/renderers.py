@@ -1,76 +1,68 @@
 #!/usr/bin/env python
+from .definitions import TableDefinition, FieldDefinition
 
 
-class DbfDescriptionPrinter():
-    def __init__(self, definition) -> None:
+class DbfDescriptionText:
+    def __init__(self, definition: TableDefinition) -> None:
         self.definition = definition
 
-    def __str__(self):
+    def __str__(self) -> str:
         result = ''
         result += f"""
 FILE DEFINITION
-filename: {self.definition.file_object.name}
+filename: {self.definition.reader.file_object.name}
 number of records: {self.definition.records}
 header's length:   {self.definition.headerlen}
 number of fields:  {self.definition.numfields}
 line size:         {self.definition.record_size}
+
 """
-        result += "FIELDS (order, name, type, size, decimals)\n"
+        result += "FIELDS\n  (order,         name, type, size, decimals)\n"
         for field in self.definition.fields:
-            result += f"  {field.order} {field.name} {field.type} {field.size} {field.decimals}\n"
+            result += f"   {field.order:>5}, {field.name:<12}, {field.type:>4}, {field.size:>4}, {field.decimals:>8}\n"
+        return result
 
 
-class DbfDescriptionMarkdown():
-    def __init__(self, definition) -> None:
+class DbfDescriptionMarkdown:
+    def __init__(self, definition: TableDefinition) -> None:
         self.definition = definition
 
-    def __str__(self):
+    def __str__(self) -> str:
         result = f"""
-### File description
+### File {self.definition.reader.file_object.name} description
 
-| info | value |
-| ---- | ---- |
-| number of records | {self.definition.records} |
-| header's length   | {self.definition.headerlen} |
-| number of fields  | {self.definition.numfields} |
-| line size         | {self.definition.record_size} |
+| info              | value   |
+| ----------------- | ------- |
+| number of records | {self.definition.records:>7} |
+| header's length   | {self.definition.headerlen:>7} |
+| number of fields  | {self.definition.numfields:>7} |
+| line size         | {self.definition.record_size:>7} |
 
 ### Fields
 
-| order | name | type | size | decimals |
-| ----- | ---- | ---- | ---- | -------- |
+| order | name         | type | size | decimals |
+| ----- | ------------ | ---- | ---- | -------- |
 """
         for field in self.definition.fields:
-            result += f"| {field.order} | {field.name} | {field.type} | {field.size} | {field.decimals} |\n"
+            result += f"| {field.order:>5} | {field.name:<12} | {field.type:>4} | {field.size:>4} | {field.decimals:>8} |\n"
         return result
 
-    def print(self):
-        print(f"{self}")
 
-
-class DbfDescriptionPostgresDDL():
-    def __init__(self, definition, tablename) -> None:
+class DbfDescriptionPostgresDDL:
+    def __init__(self, definition: TableDefinition) -> None:
         self.definition = definition
-        self.tablename = tablename
 
-    def __str__(self):
-        schema, tablename = self.tablename.split(".")
+    def __str__(self) -> str:
+        schema = 'schemaname'
+        tablename = 'tablename'
         fields = ",\n".join([DbfDescriptionPostgresDDL.pg_field_definition(field) for field in self.definition.fields])
-        return f"CREATE SCHEMA IF NOT EXISTS {schema}; CREATE TABLE IF NOT EXISTS {schema}.{tablename} (\n{fields});"
-
-    def print(self):
-        print(f"{self}")
+        return f"CREATE SCHEMA IF NOT EXISTS {schema};\n\nCREATE TABLE IF NOT EXISTS {schema}.{tablename} (\n{fields}\n);"
 
     @staticmethod
-    def pg_field_type(field):
+    def pg_field_type(field: FieldDefinition) -> str:
         if field.type == "N":
             if field.decimals > 0:
-                if field.decimals <= 6:
-                    return f"real({field.size}, {field.decimals})"
-                elif field.decimals <= 15:
-                    return f"double precision({field.size}, {field.decimals})"
-                else:
-                    raise Exception(f"Too many decimals ({field.decimals}) for field {field.name}.")
+                return f"numeric({field.size}, {field.decimals})"
             else:
                 if field.size <= 4:
                     return "smallint"
@@ -79,17 +71,15 @@ class DbfDescriptionPostgresDDL():
                 elif field.size <= 18:
                     return "bigint"
                 else:
-                    raise Exception(f"Field {field.name} is too large ({field.size}).")
+                    raise ValueError(f"Field {field.name} is too large ({field.size}).")
         elif field.type == 'D':
             return "date"
         elif field.type == 'L':
             return "boolean"
         elif field.type == 'C':
             return f"character varying({field.size})"
-        # 'F', 'B', 'M', '@', 'I', '+', 'O', 'G'
-        raise Exception(f"Field type '{field.type}' not supported")
 
     @staticmethod
-    def pg_field_definition(field):
+    def pg_field_definition(field: FieldDefinition) -> str:
         pg_type = DbfDescriptionPostgresDDL.pg_field_type(field)
-        return f"{field.name.lower()} {pg_type} NULL"
+        return f'  {field.name.lower():<12} {pg_type:<21} NULL'
