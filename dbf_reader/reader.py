@@ -41,7 +41,7 @@ class DbfReader(RawIOBase):
         # Check file object mode is read and binary
         _file_object = open(file_object, 'rb') if isinstance(file_object, str) else file_object
 
-        if _file_object.mode != 'rb':
+        if hasattr(_file_object, 'mode') and _file_object.mode != 'rb':
             raise IOError("File object need to be in binary readble mode ('rb')")
 
         # Check encoding exists
