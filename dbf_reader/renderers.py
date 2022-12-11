@@ -10,7 +10,7 @@ class DbfDescriptionText:
         result = ''
         result += f"""
 FILE DEFINITION
-filename: {self.definition.reader.file_object.name}
+filename: {self.definition.reader.file_object.name if hasattr(self.definition.reader.file_object, '') else 'not a file' }
 header's length:   {self.definition.headerlen}
 number of fields:  {self.definition.numfields}
 line size:         {self.definition.record_size}
