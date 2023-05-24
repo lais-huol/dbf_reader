@@ -13,3 +13,4 @@ django-extensions==2.2.8
 twine==1.12.1
 flake8==3.7.9
 coverage==5.0.3
+requests>=2.31.0 # not directly required, pinned by Snyk to avoid a vulnerability
